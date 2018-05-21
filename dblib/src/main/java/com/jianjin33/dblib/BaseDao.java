@@ -143,7 +143,6 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
             } else {
                 cacheKey = columnField.getName();
             }
-
             try {
                 // 反射拿到entity成员变量值
                 if (columnField.get(entity) == null) {
@@ -174,18 +173,73 @@ public abstract class BaseDao<T> implements IBaseDao<T> {
     }
 
     @Override
-    public Long delete(T where) {
-        return null;
+    public int delete(T where) {
+        Map whereClause = getValues(where);
+        Condition condition = new Condition(whereClause);
+
+        int result = database.delete(tableName, condition.getWhereClause(), condition.getWhereArgs());
+
+        return result;
     }
 
     @Override
     public List<T> query(T where) {
-        return null;
+        return this.query(where, null, null, null);
     }
 
     @Override
     public List<T> query(T where, String orderBy, Integer startIndex, Integer limit) {
+        Map<String, String> whereColumns = getValues(where);
+        Condition condition = new Condition(whereColumns);
+        Cursor cursor = null;
+        try {
+            cursor = database.query(tableName, null, condition.whereClause,
+                    condition.getWhereArgs(), null,
+                    orderBy, null, limit == null ? null : String.valueOf(limit));
+
+            return getResult(where, cursor);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) cursor.close();
+        }
         return null;
+    }
+
+    private List getResult(T where, Cursor cursor) throws InstantiationException, IllegalAccessException {
+        List<Object> result = new ArrayList<>();
+        while (cursor.moveToNext()) {
+            Object item = where.getClass().newInstance();
+            Iterator iterator = cacheMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry entry = (Map.Entry) iterator.next();
+                String columnName = (String) entry.getKey();
+                Integer columnIndex = cursor.getColumnIndex(columnName);
+
+                Field field = (Field) entry.getValue();
+                Class type = field.getType();
+                if (columnIndex != -1) {
+                    if (type == String.class) {
+                        // 反射方式赋值
+                        // field.set(item, cursor.getColumnName(columnIndex));
+                        field.set(item, cursor.getString(columnIndex));
+                    } else if (type == Double.class) {
+                        field.set(item, cursor.getDouble(columnIndex));
+                    } else if (type == Long.class) {
+                        field.set(item, cursor.getLong(columnIndex));
+                    } else if (type == Integer.class) {
+                        field.set(item, cursor.getInt(columnIndex));
+                    } else if (type == byte[].class) {
+                        field.set(item, cursor.getBlob(columnIndex));
+                    } else {
+                        continue;
+                    }
+                }
+            }
+            result.add(item);
+        }
+        return result;
     }
 
     protected abstract String createTable();

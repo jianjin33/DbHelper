@@ -12,7 +12,7 @@ public interface IBaseDao<T> {
 
     int update(T entity,T where);
 
-    Long delete(T where);
+    int delete(T where);
 
     List<T> query(T where);
 
