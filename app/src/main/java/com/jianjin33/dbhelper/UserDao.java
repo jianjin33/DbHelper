@@ -8,6 +8,6 @@ import com.jianjin33.dblib.BaseDao;
 public class UserDao extends BaseDao<User> {
     @Override
     protected String createTable() {
-        return "CREATE TABLE if not exists user (user_name varchar(20),pwd varchar(20))";
+        return "CREATE TABLE if not exists user (user_name varchar(20),pwd varchar(20),state integer(10)";
     }
 }

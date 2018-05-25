@@ -16,6 +16,9 @@ public class User {
     @DbField("pwd")
     private String password;
 
+    @DbField("state")
+    private int state;
+
     public User() {
     }
 
@@ -38,5 +41,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
     }
 }
