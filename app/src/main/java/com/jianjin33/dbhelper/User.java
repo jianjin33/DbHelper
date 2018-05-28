@@ -7,7 +7,7 @@ import com.jianjin33.dblib.annotation.DbTable;
  * Created by Administrator on 2018/5/20.
  * test
  */
-@DbTable("user")
+@DbTable("tb_user")
 public class User {
 
     @DbField("user_name")
@@ -15,6 +15,9 @@ public class User {
 
     @DbField("pwd")
     private String password;
+
+    @DbField("age")
+    private int age;
 
     @DbField("state")
     private int state;

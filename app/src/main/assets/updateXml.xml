@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <updateXml>
+    <createVersion version="1.0">
+        <createDb name="user">
+            <sql_createTable>
+                CREATE TABLE if not exists tb_user(
+                user_id integer PRIMARY KEY autoincrement,
+                name varchar(20) UNIQUE NOT NULL,
+                age integer DEFAULT 0
+                );
+            </sql_createTable>
 
-
+        </createDb>
+    </createVersion>
 </updateXml>
